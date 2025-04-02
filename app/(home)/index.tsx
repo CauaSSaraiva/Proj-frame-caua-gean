@@ -15,6 +15,7 @@ export default function Index() {
       <Link href={'/cronograma'}>Ir para Cronograma</Link>
       <Link href={'/anotacoes'}>Ir para Anotações</Link>
       <Link href={'/tarefas'}>Ir para Tarefas</Link>
+      <Link href={'/tarefas/1'}>Ir para Tarefa 1</Link>
       <Link href={'/config/index'}>Ir para Configurações</Link>
       <Link href={'/config/user'}>Ir para Configurações do Usuário</Link>
     </View>
