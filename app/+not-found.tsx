@@ -7,7 +7,7 @@ export default function DetailsScreen() {
     </View>
   );
 }
-
+// é isso
 const styles = StyleSheet.create({
   container: {
     flex: 1,
