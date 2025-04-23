@@ -7,10 +7,10 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Header from "./components/common/Header";
-import CustomCalendar from "./components/calendar/CustomCalendar";
-import AgendaList from "./components/agenda/AgendaList";
-import { EventItem } from "./components/agenda/AgendaItem";
+import Header from "../components/common/Header";
+import CustomCalendar from "../components/calendar/CustomCalendar";
+import AgendaList from "../components/agenda/AgendaList";
+import { EventItem } from "../components/agenda/AgendaItem";
 import { useRouter } from "expo-router";
 
 // Dados de exemplo

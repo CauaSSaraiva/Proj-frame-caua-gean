@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 // import { Ionicons } from '@expo/vector-icons';
 // import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Header from './components/common/Header';
-import Input from './components/common/Input';
-import Button from './components/common/Button'; // Caminho corrigido (common/Button em vez de common.Button)
+import Header from '../components/common/Header';
+import Input from '../components/common/Input';
+import Button from '../components/common/Button'; // Caminho corrigido (common/Button em vez de common.Button)
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
 const COLORS = [

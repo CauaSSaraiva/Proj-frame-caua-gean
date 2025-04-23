@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import Input from './components/common/Input';
-import Button from './components/common/Button';
-import Header from './components/common/Header';
+import Input from '../components/common/Input';
+import Button from '../components/common/Button';
+import Header from '../components/common/Header';
 
 
 

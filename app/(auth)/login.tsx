@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet, Alert } from 'react-native';
-import Input from './components/common/Input';
-import Button from './components/common/Button';
+import Input from '../components/common/Input';
+import Button from '../components/common/Button';
 import { useRouter } from 'expo-router';
-import { saveToken, removeToken } from './utils/auth';
+import { saveToken, removeToken } from '../utils/auth';
 
 type Inputs = {
   email: string;
@@ -81,7 +81,7 @@ const LoginScreen = () => {
       <View style={styles.content}>
         <View style={styles.headerContainer}>
           <Image
-            source={require('../assets/icon.png')}
+            source={require('../../assets/icon.png')}
             style={styles.logo}
           />
           <Text style={styles.title}>Agenda App</Text>
@@ -124,6 +124,8 @@ const LoginScreen = () => {
             onPress={() => verificaLogin({ email, senha, continuar })}
             loading={loading}
           />
+
+
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Não tem uma conta? </Text>
