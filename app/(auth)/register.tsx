@@ -39,6 +39,8 @@ const RegisterScreen: React.FC = () => {
 
 
     try {
+      const { confirmarSenha, ...dadosLimpos } = data;
+      console.log("Dados enviados:", dadosLimpos);
           const response = await fetch(
             `${process.env.EXPO_PUBLIC_URL_API}/clientes/register`,
             {
@@ -46,7 +48,7 @@ const RegisterScreen: React.FC = () => {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(data),
+              body: JSON.stringify(dadosLimpos),
             }
           );
     

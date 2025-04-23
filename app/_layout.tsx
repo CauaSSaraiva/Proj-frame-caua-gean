@@ -1,27 +1,51 @@
 // app/_layout.tsx
 import { Slot, useRouter, useSegments } from "expo-router";
-import { useEffect, useState } from "react";
-import { getToken } from "./utils/auth"; // sua função com AsyncStorage
+import { useEffect, useState, createContext, useContext } from "react";
+import { getToken } from "./utils/auth"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+// adicionando context pq se não ele vai sempre redirecionar de volta pro login
+// se o usuario nao marcar o  lembrar de mim lá
+const AuthContext = createContext<{
+  setMemoryToken: (token: string | null) => void;
+} | null>(null);
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context)
+    throw new Error("useAuth precisa estar dentro do AuthProvider");
+  return context;
+}
+
 
 export default function RootLayout() {
   const [isAuthChecked, setAuthChecked] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [memoryToken, setMemoryToken] = useState<string | null>(null);
+
+
   const segments = useSegments();
   const router = useRouter();
+
 
   useEffect(() => {
     async function checkLogin() {
       const token = await getToken();
-      setLoggedIn(!!token);
+      if (token || memoryToken) {
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
       setAuthChecked(true);
     }
 
-    if (__DEV__) {
-      AsyncStorage.setItem("auth_token", "fake-token");
-    }
+    // comentar e descomentar isso aqui pra testar a autenticação
+    // if (__DEV__) {
+    //   AsyncStorage.setItem("auth_token", "fake-token");
+    // }
     checkLogin();
-  }, []);
+  }, [memoryToken]);
 
   useEffect(() => {
     if (!isAuthChecked) return;
@@ -37,5 +61,9 @@ export default function RootLayout() {
 
   if (!isAuthChecked) return null; // ou uma tela de loading
 
-  return <Slot />;
+    return (
+      <AuthContext.Provider value={{ setMemoryToken }}>
+        <Slot />
+      </AuthContext.Provider>
+    );
 }

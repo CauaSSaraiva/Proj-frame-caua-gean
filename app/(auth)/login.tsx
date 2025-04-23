@@ -4,6 +4,7 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useRouter } from 'expo-router';
 import { saveToken, removeToken } from '../utils/auth';
+import { useAuth } from '../_layout';
 
 type Inputs = {
   email: string;
@@ -11,9 +12,11 @@ type Inputs = {
   continuar: boolean;
 };
 
+console.log("API URL:", process.env.EXPO_PUBLIC_URL_API);
 
 
 const LoginScreen = () => {
+  const {setMemoryToken} = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -44,6 +47,8 @@ const LoginScreen = () => {
 
     setLoading(true)
     try {
+      const {continuar, ...dadosLimpos} = data;
+      console.log("Dados enviados:", dadosLimpos);
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_URL_API}/clientes/login`,
         {
@@ -51,28 +56,29 @@ const LoginScreen = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(dadosLimpos),
         }
       );
 
       if (response.status === 200) {
         const dados = await response.json(); // pode conter token, id, nome, etc
-
+        console.log(dados)
         // Salvar dados no AsyncStorage
-        if (data.continuar) {
-          await saveToken(dados.token)
+          if (data.continuar) {
+            await saveToken(dados.token)
+          } else {
+            await removeToken();
+            setMemoryToken(dados.token)
+          }
+          setLoading(false)
+          router.replace('/'); // vai para home se estiver logado
         } else {
-          await removeToken()
+          Alert.alert('Erro', 'Login ou senha incorretos');
         }
-        setLoading(false)
-        router.replace('./index'); // vai para home se estiver logado
-      } else {
-        Alert.alert('Erro', 'Login ou senha incorretos');
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Erro', 'Algo deu errado...');
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', 'Algo deu errado...');
-    }
   }
 
 
