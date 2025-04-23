@@ -6,6 +6,9 @@ import Header from './components/common/Header';
 import Button from './components/common/Button';
 import { EventItem } from './components/agenda/AgendaItem';
 
+
+// tem que adaptar essa página toda pra parar de usar react-navigation e etc
+
 type EventDetailsParams = {
   eventId: string;
 };

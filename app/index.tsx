@@ -67,13 +67,6 @@ const HomeScreen = () => {
     });
   };
 
-  // const handleAddEvent = () => {
-  //   router.push({
-  //     pathname: '/screens/agenda/AddEventScreen',
-  //     params: { date: selectedDate.toISOString() }
-  //   });
-  // };
-
   const handleAddEvent = () => {
     // Formata a data como string simples (YYYY-MM-DD)
     try {

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet } from 'react-native';
-// import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet, Alert } from 'react-native';
 import Input from './components/common/Input';
 import Button from './components/common/Button';
 import { useRouter } from 'expo-router';
+import { saveToken, removeToken } from './utils/auth';
 
-type AuthStackParamList = {
-  Login: undefined;
-  Register: undefined;
-  App: undefined;
+type Inputs = {
+  email: string;
+  senha: string;
+  continuar: boolean;
 };
 
 
@@ -16,60 +16,78 @@ type AuthStackParamList = {
 const LoginScreen = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
+  const [continuar, setContinuar] = useState(false)
   const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
 
-  const validateForm = () => {
-    const newErrors: { email?: string, password?: string } = {};
-    
-    if (!email) {
-      newErrors.email = 'O e-mail é obrigatório';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'E-mail inválido';
-    }
-    
-    if (!password) {
-      newErrors.password = 'A senha é obrigatória';
-    } else if (password.length < 6) {
-      newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  // const validateForm = () => {
+  //   const newErrors: { email?: string, password?: string } = {};
 
-  const handleLogin = async () => {
-    if (!validateForm()) return;
-    
-    setLoading(true);
-    
+  //   if (!email) {
+  //     newErrors.email = 'O e-mail é obrigatório';
+  //   } else if (!/\S+@\S+\.\S+/.test(email)) {
+  //     newErrors.email = 'E-mail inválido';
+  //   }
+
+  //   if (!senha) {
+  //     newErrors.password = 'A senha é obrigatória';
+  //   } else if (senha.length < 6) {
+  //     newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
+
+  async function verificaLogin(data: Inputs) {
+
+    setLoading(true)
     try {
-      // Simulação de login
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Navegar para a tela principal após login bem-sucedido
-      // navigation.replace('App');
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_URL_API}/clientes/login`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (response.status === 200) {
+        const dados = await response.json(); // pode conter token, id, nome, etc
+
+        // Salvar dados no AsyncStorage
+        if (data.continuar) {
+          await saveToken(dados.token)
+        } else {
+          await removeToken()
+        }
+        setLoading(false)
+        router.replace('./index'); // vai para home se estiver logado
+      } else {
+        Alert.alert('Erro', 'Login ou senha incorretos');
+      }
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      // Exibir mensagem de erro
-    } finally {
-      setLoading(false);
+      console.error(error);
+      Alert.alert('Erro', 'Algo deu errado...');
     }
-  };
+  }
+
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.headerContainer}>
-          <Image 
-            source={require('../assets/icon.png')} 
+          <Image
+            source={require('../assets/icon.png')}
             style={styles.logo}
           />
           <Text style={styles.title}>Agenda App</Text>
           <Text style={styles.subtitle}>Organize sua rotina com facilidade</Text>
         </View>
-        
+
         <Input
           label="E-mail"
           value={email}
@@ -78,33 +96,42 @@ const LoginScreen = () => {
           keyboardType="email-address"
           error={errors.email}
         />
-        
+
         <Input
           label="Senha"
-          value={password}
-          onChangeText={setPassword}
+          value={senha}
+          onChangeText={setSenha}
           placeholder="Digite sua senha"
           secureTextEntry
           error={errors.password}
         />
-        
+
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
         </TouchableOpacity>
-        
-        <Button
-          title="Entrar"
-          onPress={handleLogin}
-          loading={loading}
-        />
-        
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>Não tem uma conta? </Text>
-          <TouchableOpacity onPress={() => router.push('/register')}>
-            <Text style={styles.registerLink}>Cadastre-se</Text>
-          </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setContinuar(true)}
+          style={styles.checkboxContainer}
+        >
+          <View style={[styles.checkbox, continuar && styles.checkboxChecked]} />
+          <Text style={styles.checkboxLabel}>Continuar logado</Text>
+        </TouchableOpacity>
+
+
+          <Button
+            title="Entrar"
+            onPress={() => verificaLogin({ email, senha, continuar })}
+            loading={loading}
+          />
+
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>Não tem uma conta? </Text>
+            <TouchableOpacity onPress={() => router.push('/register')}>
+              <Text style={styles.registerLink}>Cadastre-se</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
     </SafeAreaView>
   );
 };
@@ -153,7 +180,30 @@ const styles = StyleSheet.create({
   registerLink: {
     color: '#3B82F6',
     fontWeight: '500'
-  }
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  
+  checkboxChecked: {
+    backgroundColor: '#007bff', // azul ou a cor que quiser
+  },
+  
+  checkboxLabel: {
+    fontSize: 14,
+    color: '#333',
+  },
 });
 
 export default LoginScreen;

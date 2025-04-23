@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import Input from './components/common/Input';
 import Button from './components/common/Button';
@@ -11,69 +11,55 @@ import Header from './components/common/Header';
 const RegisterScreen: React.FC = () => {
   const router = useRouter();
 
-  const [name, setName] = useState('');
+  const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string,
     email?: string,
-    password?: string,
-    confirmPassword?: string
+    senha?: string,
+    confirmSenha?: string
   }>({});
 
-  const validateForm = () => {
-    const newErrors: {
-      name?: string,
-      email?: string,
-      password?: string,
-      confirmPassword?: string
-    } = {};
-
-    if (!name) {
-      newErrors.name = 'O nome é obrigatório';
-    }
-
-    if (!email) {
-      newErrors.email = 'O e-mail é obrigatório';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'E-mail inválido';
-    }
-
-    if (!password) {
-      newErrors.password = 'A senha é obrigatória';
-    } else if (password.length < 6) {
-      newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Confirme sua senha';
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'As senhas não coincidem';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  type Inputs = {
+    nome: string;
+    email: string;
+    senha: string;
+    confirmarSenha: string;
   };
 
-  const handleRegister = async () => {
-    if (!validateForm()) return;
+  
+  const handleRegister = async (data: Inputs) => {
+    if (data.senha !== data.confirmarSenha) {  
+      alert("As senhas não coincidem!");  
+      return;  
+    }
 
-    setLoading(true);
 
     try {
-      // Simulação de registro
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Navegar para a tela de login após registro bem-sucedido
-      ('Login');
-    } catch (error) {
-      console.error('Erro ao registrar usuário:', error);
-      // Exibir mensagem de erro
-    } finally {
-      setLoading(false);
-    }
+          const response = await fetch(
+            `${process.env.EXPO_PUBLIC_URL_API}/clientes/register`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            }
+          );
+    
+          if (response.status === 200) {
+            Alert.alert('Sucesso', 'Cadastro realizado com sucesso')
+            router.replace('./login'); // vai para home se estiver logado
+          } else {
+            Alert.alert('Erro', 'Login ou senha incorretos');
+          }
+        } catch (error) {
+          console.error(error);
+          Alert.alert('Erro', 'Algo deu errado...');
+        }
   };
 
   return (
@@ -91,8 +77,8 @@ const RegisterScreen: React.FC = () => {
 
         <Input
           label="Nome"
-          value={name}
-          onChangeText={setName}
+          value={nome}
+          onChangeText={setNome}
           placeholder="Digite seu nome completo"
           error={errors.name}
         />
@@ -108,26 +94,26 @@ const RegisterScreen: React.FC = () => {
 
         <Input
           label="Senha"
-          value={password}
-          onChangeText={setPassword}
+          value={senha}
+          onChangeText={setSenha}
           placeholder="Digite sua senha"
           secureTextEntry
-          error={errors.password}
+          error={errors.senha}
         />
 
         <Input
           label="Confirmar senha"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
           placeholder="Confirme sua senha"
           secureTextEntry
-          error={errors.confirmPassword}
+          error={errors.confirmSenha}
         />
 
         <View style={styles.buttonContainer}>
           <Button
             title="Cadastrar"
-            onPress={handleRegister}
+            onPress={() => handleRegister({ email, senha, confirmarSenha, nome })}
             loading={loading}
           />
         </View>
