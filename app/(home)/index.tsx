@@ -47,7 +47,7 @@ import { useRouter } from "expo-router";
 
 const HomeScreen = () => {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
 
   // useEffect(() => {
@@ -57,7 +57,7 @@ const HomeScreen = () => {
   // }, []);
 
   const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
+    setDataSelecionada(date);
   };
 
   const handleEventPress = (event: EventItem) => {
@@ -72,7 +72,7 @@ const HomeScreen = () => {
     try {
       router.push({
         pathname: "/add-event",
-        params: { date: selectedDate.toISOString() },
+        params: { date: dataSelecionada.toISOString() },
       });
     } catch (error) {
       console.error("Erro ao navegar:", error);
@@ -87,7 +87,7 @@ const HomeScreen = () => {
   const markedDates = events.map((event) => event.date);
 
   const filteredEvents = events.filter(
-    (event) => event.date === formatDate(selectedDate)
+    (event) => event.date === formatDate(dataSelecionada)
   );
 
   return (
@@ -103,14 +103,14 @@ const HomeScreen = () => {
 
       <View style={styles.contentContainer}>
         <CustomCalendar
-          selectedDate={selectedDate}
+          selectedDate={dataSelecionada}
           onDateSelect={handleDateSelect}
           markedDates={markedDates}
         />
 
         <View style={styles.eventsContainer}>
           <Text style={styles.dateHeader}>
-            Eventos para {selectedDate.toLocaleDateString("pt-BR")}
+            Eventos para {dataSelecionada.toLocaleDateString("pt-BR")}
           </Text>
           <AgendaList
             events={filteredEvents}

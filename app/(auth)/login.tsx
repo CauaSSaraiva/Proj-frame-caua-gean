@@ -62,7 +62,7 @@ const LoginScreen = () => {
       );
 
       if (response.status === 200) {
-        const dados = await response.json(); // pode conter token, id, nome, etc
+        const dados = await response.json(); 
         console.log(dados)
         // Salvar dados no AsyncStorage
           if (data.continuar) {
@@ -73,7 +73,7 @@ const LoginScreen = () => {
             setMemoryToken(dados.token)
           }
           setLoading(false)
-          console.log("antes do replace")
+
           router.replace('/'); // vai para home se estiver logado
         } else {
           if (Platform.OS == 'web') {

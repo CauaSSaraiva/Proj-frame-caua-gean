@@ -16,27 +16,22 @@ const COLORS = [
   '#EC4899', // pink
 ];
 
-
-
-
-
-
 const AddEventScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   
   // Convertendo o parâmetro de data
-  const initialDate = params.date 
+  const dataInicial = params.date 
     ? new Date(params.date as string) 
     : new Date();
   
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState(initialDate.toISOString().split('T')[0]);
-  const [startTime, setStartTime] = useState('09:00');
-  const [endTime, setEndTime] = useState('10:00');
-  const [location, setLocation] = useState('');
-  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [descricao, setDescricao] = useState('');
+  const [data, setData] = useState(dataInicial.toISOString().split('T')[0]);
+  const [timeInicio, setTimeInicio] = useState('09:00');
+  const [timeFim, setTimeFim] = useState('10:00');
+  const [localizacao, setLocalizacao] = useState('');
+  const [corSelecionada, setCorSelecionada] = useState(COLORS[0]);
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
@@ -50,7 +45,7 @@ const AddEventScreen = () => {
     try {
       // Simulação de uma operação assíncrona
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Navegar de volta após salvar
       router.back();
     } catch (error) {
@@ -79,8 +74,8 @@ const AddEventScreen = () => {
 
         <Input
           label="Descrição"
-          value={description}
-          onChangeText={setDescription}
+          value={descricao}
+          onChangeText={setDescricao}
           placeholder="Digite uma descrição"
           multiline
           error=""
@@ -88,8 +83,8 @@ const AddEventScreen = () => {
 
         <Input
           label="Data"
-          value={date}
-          onChangeText={setDate}
+          value={data}
+          onChangeText={setData}
           placeholder="YYYY-MM-DD"
           error=""
         />
@@ -97,8 +92,8 @@ const AddEventScreen = () => {
         <View style={styles.timeContainer}>
           <Input
             label="Hora de início"
-            value={startTime}
-            onChangeText={setStartTime}
+            value={timeInicio}
+            onChangeText={setTimeInicio}
             placeholder="HH:MM"
             style={styles.timeInput}
             error=""
@@ -106,8 +101,8 @@ const AddEventScreen = () => {
 
           <Input
             label="Hora de término"
-            value={endTime}
-            onChangeText={setEndTime}
+            value={timeFim}
+            onChangeText={setTimeFim}
             placeholder="HH:MM"
             style={styles.timeInput}
             error=""
@@ -116,8 +111,8 @@ const AddEventScreen = () => {
 
         <Input
           label="Local"
-          value={location}
-          onChangeText={setLocation}
+          value={localizacao}
+          onChangeText={setLocalizacao}
           placeholder="Digite o local do evento"
           error=""
         />
@@ -130,9 +125,9 @@ const AddEventScreen = () => {
               style={[
                 styles.colorOption,
                 { backgroundColor: color },
-                selectedColor === color && styles.selectedColor
+                corSelecionada === color && styles.selectedColor
               ]}
-              onPress={() => setSelectedColor(color)}
+              onPress={() => setCorSelecionada(color)}
             />
           ))}
         </View>
