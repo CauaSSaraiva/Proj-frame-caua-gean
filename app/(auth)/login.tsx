@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet, Alert, Platform } from 'react-native';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,7 @@ import { saveToken, removeToken } from '../utils/auth';
 import { useAuth } from '../_layout';
 
 type Inputs = {
-  email: string;
+  email: string; 
   senha: string;
   continuar: boolean;
 };
@@ -24,6 +24,7 @@ const LoginScreen = () => {
   const [continuar, setContinuar] = useState(false)
   const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
 
+  // essa lógica ja está na API, comentada por enquanto
   // const validateForm = () => {
   //   const newErrors: { email?: string, password?: string } = {};
 
@@ -66,14 +67,20 @@ const LoginScreen = () => {
         // Salvar dados no AsyncStorage
           if (data.continuar) {
             await saveToken(dados.token)
+            setMemoryToken(dados.token) // salvando o temporário também para o useffect disparar e redirecionar corretamente
           } else {
             await removeToken();
             setMemoryToken(dados.token)
           }
           setLoading(false)
+          console.log("antes do replace")
           router.replace('/'); // vai para home se estiver logado
         } else {
-          Alert.alert('Erro', 'Login ou senha incorretos');
+          if (Platform.OS == 'web') {
+            window.alert('Login ou senha incorretos')
+          } else {
+            Alert.alert('Erro', 'Login ou senha incorretos');
+          }
         }
       } catch (error) {
         console.error(error);

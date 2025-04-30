@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
@@ -51,9 +51,13 @@ const RegisterScreen: React.FC = () => {
               body: JSON.stringify(dadosLimpos),
             }
           );
-    
-          if (response.status === 200) {
-            Alert.alert('Sucesso', 'Cadastro realizado com sucesso')
+
+          if (response.status === 201) {
+            if (Platform.OS == "web") {
+              window.alert("Cadastro realizado com sucesso!")
+            } else {
+              Alert.alert('Sucesso', 'Cadastro realizado com sucesso')
+            }
             router.replace('./login'); // vai para home se estiver logado
           } else {
             Alert.alert('Erro', 'Login ou senha incorretos');

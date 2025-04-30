@@ -50,7 +50,7 @@ const AddEventScreen = () => {
     try {
       // Simulação de uma operação assíncrona
       await new Promise(resolve => setTimeout(resolve, 1000));
-
+      
       // Navegar de volta após salvar
       router.back();
     } catch (error) {

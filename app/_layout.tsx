@@ -31,7 +31,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function checkLogin() {
-      const token = await getToken();
+      const token = memoryToken || await getToken();
       if (token || memoryToken) {
         setLoggedIn(true);
       } else {
