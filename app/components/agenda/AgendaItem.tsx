@@ -3,15 +3,24 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export interface EventItem {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location?: string;
-  color?: string;
+  id: number;
+  // data: any;
+  // title: string;
+  // description: string;
+  // date: string;
+  // startTime: string;
+  // endTime: string;
+  // location?: string;
+  // color?: string;
+  title: string
+  descricao: string
+  data: string
+  timeInicio: string
+  timeFim: string
+  localizacao: string
+  corSelecionada: string
 }
+
 
 interface AgendaItemProps {
   event: EventItem;
@@ -19,7 +28,7 @@ interface AgendaItemProps {
 }
 
 const AgendaItem: React.FC<AgendaItemProps> = ({ event, onPress }) => {
-  const { title, description, startTime, endTime, location, color = '#3B82F6' } = event;
+  const { title, descricao, timeInicio, timeFim, localizacao, corSelecionada = '#3B82F6' } = event;
 
   return (
     <TouchableOpacity 
@@ -28,20 +37,20 @@ const AgendaItem: React.FC<AgendaItemProps> = ({ event, onPress }) => {
     >
       <View style={styles.contentRow}>
         <View
-          style={[styles.colorIndicator, { backgroundColor: color }]}
+          style={[styles.colorIndicator, { backgroundColor: corSelecionada }]}
         />
         <View style={styles.contentContainer}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.timeText}>{startTime} - {endTime}</Text>
+            <Text style={styles.timeText}>{timeInicio} - {timeFim}</Text>
           </View>
           
-          <Text numberOfLines={2} style={styles.description}>{description}</Text>
+          <Text numberOfLines={2} style={styles.description}>{descricao}</Text>
           
           {location && (
             <View style={styles.locationContainer}>
               <Ionicons name="location-outline" size={14} color="#666" />
-              <Text style={styles.locationText}>{location}</Text>
+              <Text style={styles.locationText}>{localizacao}</Text>
             </View>
           )}
         </View>

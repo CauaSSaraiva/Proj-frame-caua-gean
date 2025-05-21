@@ -60,6 +60,7 @@ const LoginScreen = () => {
           body: JSON.stringify(dadosLimpos),
         }
       );
+      
 
       if (response.status === 200) {
         const dados = await response.json(); 

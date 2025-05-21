@@ -24,10 +24,10 @@ const AgendaList: React.FC<AgendaListProps> = ({
     const grouped: Record<string, EventItem[]> = {};
     
     events.forEach(event => {
-      if (!grouped[event.date]) {
-        grouped[event.date] = [];
+      if (!grouped[event.data]) {
+        grouped[event.data] = [];
       }
-      grouped[event.date].push(event);
+      grouped[event.data].push(event);
     });
     
     return Object.keys(grouped).map(date => ({
@@ -35,6 +35,8 @@ const AgendaList: React.FC<AgendaListProps> = ({
       data: grouped[date]
     }));
   };
+
+
 
   if (events.length === 0) {
     return (

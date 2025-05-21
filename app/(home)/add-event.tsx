@@ -7,6 +7,17 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button'; // Caminho corrigido (common/Button em vez de common.Button)
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
+type Inputs = {
+  title: string
+  descricao: string
+  data: Date
+  timeInicio: string
+  timeFim: string
+  localizacao: string
+  corSelecionada: string
+}
+
+
 const COLORS = [
   '#3B82F6', // blue
   '#EF4444', // red
@@ -19,12 +30,12 @@ const COLORS = [
 const AddEventScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  
+
   // Convertendo o parâmetro de data
-  const dataInicial = params.date 
-    ? new Date(params.date as string) 
+  const dataInicial = params.date
+    ? new Date(params.date as string)
     : new Date();
-  
+
   const [title, setTitle] = useState('');
   const [descricao, setDescricao] = useState('');
   const [data, setData] = useState(dataInicial.toISOString().split('T')[0]);
@@ -41,10 +52,38 @@ const AddEventScreen = () => {
     }
 
     setLoading(true);
-    
+
+
     try {
       // Simulação de uma operação assíncrona
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const novoEvento: Inputs = {
+        title,
+        descricao,
+        data: new Date(data),
+        timeInicio,
+        timeFim,
+        localizacao,
+        corSelecionada
+
+      }
+
+
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_URL_API}/eventos`,
+        {
+          method: "POST",
+          headers: { "Content-type": "Application/json" },
+          body: JSON.stringify(novoEvento),
+        }
+      )
+      console.log(novoEvento)
+
+      if (response.status == 201) {
+        console.log("caiu no 201")
+        
+      }
 
       // Navegar de volta após salvar
       router.back();
@@ -57,8 +96,8 @@ const AddEventScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Novo Evento" 
+      <Header
+        title="Novo Evento"
         showBackButton
         onBackPress={() => router.back()}
       />

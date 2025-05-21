@@ -13,7 +13,7 @@ import AgendaList from "../components/agenda/AgendaList";
 import { EventItem } from "../components/agenda/AgendaItem";
 import { useRouter } from "expo-router";
 
-// Dados de exemplo
+
 // const mockEvents: EventItem[] = [
 //   {
 //     id: '1',
@@ -50,11 +50,25 @@ const HomeScreen = () => {
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
 
-  // useEffect(() => {
-  //   // Simular carregamento de eventos
-  //   // uma API ou banco de dados
-  //   setEvents('');
-  // }, []);
+  async function getDados() {
+        const response = await fetch(
+      `${process.env.EXPO_PUBLIC_URL_API}/eventos`,
+      {
+        method: "GET",
+        headers: { "Content-type": "Application/json" },
+      }
+    )
+    const dados = await response.json()
+    console.log(dados)
+    setEvents(dados)
+  }
+  useEffect(() => {
+    // Simular carregamento de eventos
+    // uma API ou banco de dados
+
+
+    getDados()
+  }, []);
 
   const handleDateSelect = (date: Date) => {
     setDataSelecionada(date);
@@ -81,15 +95,21 @@ const HomeScreen = () => {
 
   // Formatação de data para comparação com os eventos
   const formatDate = (date: Date): string => {
-    return date.toISOString().split("T")[0];
+    // return date.toISOString().split("T")[0];
+    return date.toISOString();
   };
 
-  const markedDates = events.map((event) => event.date);
+  const markedDates = events.map((event) => event.data);
+
+  console.log(markedDates)
 
   const filteredEvents = events.filter(
-    (event) => event.date === formatDate(dataSelecionada)
+    (event) => event.data == formatDate(dataSelecionada)
   );
-
+  // tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
+  // ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
+  console.log(formatDate(dataSelecionada))
+  console.log(filteredEvents)
   return (
     <SafeAreaView style={styles.container}>
       <Header
