@@ -1,47 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Alert, SafeAreaView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Header from './components/common/Header';
 import Button from './components/common/Button';
 import { EventItem } from './components/agenda/AgendaItem';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
+const EventDetailsScreen = () => {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { eventId } = params;
 
-// tem que adaptar essa página toda pra parar de usar react-navigation e etc
-
-type EventDetailsParams = {
-  eventId: string;
-};
-
-type Props = NativeStackScreenProps<any, 'EventDetails'>;
-
-const EventDetailsScreen = ({ navigation, route }: Props) => {
-  const { eventId } = route.params as EventDetailsParams;
   const [event, setEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular carregamento do evento a partir de um ID
-    // Em um app real, isso viria de uma API ou banco de dados
-    const mockEvent: EventItem = {
-      id: eventId,
-      title: 'Reunião de equipe',
-      description: 'Discussão sobre o andamento do projeto e próximos passos. Preparar apresentação de status e trazer relatórios de progresso.',
-      date: '2023-10-15',
-      startTime: '09:00',
-      endTime: '10:00',
-      location: 'Sala de conferência - 3º andar',
-      color: '#3B82F6'
-    };
-
-    setTimeout(() => {
-      setEvent(mockEvent);
-      setLoading(false);
-    }, 500);
+    async function fetchEvent() {
+      try {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventId}`,
+          {
+            method: "GET",
+            headers: { "Content-type": "Application/json" },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setEvent(data);
+        } else {
+          setEvent(null);
+        }
+      } catch (error) {
+        setEvent(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (eventId) {
+      fetchEvent();
+    }
   }, [eventId]);
 
   const handleEdit = () => {
-    navigation.navigate('AddEvent', { event });
+    router.push({
+      pathname: "/add-event",
+      params: { eventId: event?.id },
+    });
   };
 
   const handleDelete = () => {
@@ -56,10 +60,16 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
         {
           text: 'Excluir',
           style: 'destructive',
-          onPress: () => {
-            // Aqui você deletaria o evento no backend
-            // Depois navega de volta
-            navigation.goBack();
+          onPress: async () => {
+            try {
+              await fetch(
+                `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventId}`,
+                { method: "DELETE" }
+              );
+              router.back();
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível excluir o evento.');
+            }
           }
         }
       ]
@@ -72,7 +82,7 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
         <Header 
           title="Detalhes do Evento" 
           showBackButton
-          onBackPress={() => navigation.goBack()}
+          onBackPress={() => router.back()}
         />
         <View style={styles.centerContainer}>
           <Text>Carregando...</Text>
@@ -87,7 +97,7 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
         <Header 
           title="Detalhes do Evento" 
           showBackButton
-          onBackPress={() => navigation.goBack()}
+          onBackPress={() => router.back()}
         />
         <View style={styles.centerContainer}>
           <Text>Evento não encontrado</Text>
@@ -101,12 +111,12 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
       <Header 
         title="Detalhes do Evento" 
         showBackButton
-        onBackPress={() => navigation.goBack()}
+        onBackPress={() => router.back()}
       />
 
       <ScrollView style={styles.scrollView}>
         <View 
-          style={[styles.colorBar, { backgroundColor: event.color || '#3B82F6' }]}
+          style={[styles.colorBar, { backgroundColor: event.corSelecionada || '#3B82F6' }]}
         />
         
         <View style={styles.content}>
@@ -117,28 +127,28 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
               <View style={styles.iconContainer}>
                 <Ionicons name="calendar-outline" size={18} color="#666" />
               </View>
-              <Text style={styles.infoText}>{new Date(event.date).toLocaleDateString('pt-BR')}</Text>
+              <Text style={styles.infoText}>{new Date(event.data).toLocaleDateString('pt-BR')}</Text>
             </View>
             
             <View style={styles.infoRow}>
               <View style={styles.iconContainer}>
                 <Ionicons name="time-outline" size={18} color="#666" />
               </View>
-              <Text style={styles.infoText}>{event.startTime} - {event.endTime}</Text>
+              <Text style={styles.infoText}>{event.timeInicio} - {event.timeFim}</Text>
             </View>
             
-            {event.location && (
+            {event.localizacao && (
               <View style={styles.infoRow}>
                 <View style={styles.iconContainer}>
                   <Ionicons name="location-outline" size={18} color="#666" />
                 </View>
-                <Text style={styles.infoText}>{event.location}</Text>
+                <Text style={styles.infoText}>{event.localizacao}</Text>
               </View>
             )}
           </View>
           
           <Text style={styles.sectionTitle}>Descrição</Text>
-          <Text style={styles.description}>{event.description}</Text>
+          <Text style={styles.description}>{event.descricao}</Text>
           
           <View style={styles.buttonRow}>
             <View style={styles.buttonContainer}>

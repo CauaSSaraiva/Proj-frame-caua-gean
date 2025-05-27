@@ -95,8 +95,7 @@ const HomeScreen = () => {
 
   // Formatação de data para comparação com os eventos
   const formatDate = (date: Date): string => {
-    // return date.toISOString().split("T")[0];
-    return date.toISOString();
+    return date.toISOString().split("T")[0]; // Retorna só o "YYYY-MM-DD"
   };
 
   const markedDates = events.map((event) => event.data);
@@ -104,7 +103,13 @@ const HomeScreen = () => {
   console.log(markedDates)
 
   const filteredEvents = events.filter(
-    (event) => event.data == formatDate(dataSelecionada)
+    (event) => {
+      // Garante que event.data é string
+      const eventDate = typeof event.data === "string"
+        ? event.data.split("T")[0]
+        : new Date(event.data).toISOString().split("T")[0];
+      return eventDate === formatDate(dataSelecionada);
+    }
   );
   // tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
   // ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
