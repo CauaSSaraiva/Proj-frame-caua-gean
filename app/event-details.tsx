@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Alert, SafeAreaView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Alert, SafeAreaView, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from './components/common/Header';
 import Button from './components/common/Button';
@@ -41,17 +41,42 @@ const EventDetailsScreen = () => {
     }
   }, [eventId]);
 
-  const handleEdit = () => {
-    router.push({
-      pathname: "/add-event",
-      params: { eventId: event?.id },
-    });
-  };
+const deletarEvento = async () => {
+  try {
+    await fetch(
+      `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventId}`,
+      { method: "DELETE" }
+    );
+    router.back();
+  } catch (error) {
+    console.error('Erro ao excluir evento:', error);
+    if (Platform.OS === 'web') {
+      alert('Não foi possível excluir o evento.');
+    } else {
+      Alert.alert('Erro', 'Não foi possível excluir o evento.');
+    }
+  }
+}
+  
 
-  const handleDelete = () => {
+const handleEdit = () => {
+  router.push({
+    pathname: "/add-event",
+    params: { eventId: event?.id },
+  });
+};
+
+const handleDelete = () => {
+  if (Platform.OS == 'web') {
+    if (window.confirm("Tem certeza de que deseja excluir este evento?")) {
+      deletarEvento()
+      router.back();
+    }
+  } else {
+
     Alert.alert(
       'Confirmar exclusão',
-      'Tem certeza de que deseja excluir este evento?',
+      "Tem certeza de que deseja excluir este evento?",
       [
         {
           text: 'Cancelar',
@@ -60,117 +85,108 @@ const EventDetailsScreen = () => {
         {
           text: 'Excluir',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await fetch(
-                `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventId}`,
-                { method: "DELETE" }
-              );
-              router.back();
-            } catch (error) {
-              Alert.alert('Erro', 'Não foi possível excluir o evento.');
-            }
-          }
+          onPress: () => deletarEvento() // Forma correta para onPress
         }
       ]
     );
-  };
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Header 
-          title="Detalhes do Evento" 
-          showBackButton
-          onBackPress={() => router.back()}
-        />
-        <View style={styles.centerContainer}>
-          <Text>Carregando...</Text>
-        </View>
-      </SafeAreaView>
-    );
   }
+};
 
-  if (!event) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Header 
-          title="Detalhes do Evento" 
-          showBackButton
-          onBackPress={() => router.back()}
-        />
-        <View style={styles.centerContainer}>
-          <Text>Evento não encontrado</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
+if (loading) {
   return (
     <SafeAreaView style={styles.container}>
-      <Header 
-        title="Detalhes do Evento" 
+      <Header
+        title="Detalhes do Evento"
         showBackButton
         onBackPress={() => router.back()}
       />
-
-      <ScrollView style={styles.scrollView}>
-        <View 
-          style={[styles.colorBar, { backgroundColor: event.corSelecionada || '#3B82F6' }]}
-        />
-        
-        <View style={styles.content}>
-          <Text style={styles.title}>{event.title}</Text>
-          
-          <View style={styles.infoSection}>
-            <View style={styles.infoRow}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="calendar-outline" size={18} color="#666" />
-              </View>
-              <Text style={styles.infoText}>{new Date(event.data).toLocaleDateString('pt-BR')}</Text>
-            </View>
-            
-            <View style={styles.infoRow}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="time-outline" size={18} color="#666" />
-              </View>
-              <Text style={styles.infoText}>{event.timeInicio} - {event.timeFim}</Text>
-            </View>
-            
-            {event.localizacao && (
-              <View style={styles.infoRow}>
-                <View style={styles.iconContainer}>
-                  <Ionicons name="location-outline" size={18} color="#666" />
-                </View>
-                <Text style={styles.infoText}>{event.localizacao}</Text>
-              </View>
-            )}
-          </View>
-          
-          <Text style={styles.sectionTitle}>Descrição</Text>
-          <Text style={styles.description}>{event.descricao}</Text>
-          
-          <View style={styles.buttonRow}>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Editar"
-                onPress={handleEdit}
-                type="outline"
-              />
-            </View>
-            
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Excluir"
-                onPress={handleDelete}
-                type="secondary"
-              />
-            </View>
-          </View>
-        </View>
-      </ScrollView>
+      <View style={styles.centerContainer}>
+        <Text>Carregando...</Text>
+      </View>
     </SafeAreaView>
   );
+}
+
+if (!event) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header
+        title="Detalhes do Evento"
+        showBackButton
+        onBackPress={() => router.back()}
+      />
+      <View style={styles.centerContainer}>
+        <Text>Evento não encontrado</Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+return (
+  <SafeAreaView style={styles.container}>
+    <Header
+      title="Detalhes do Evento"
+      showBackButton
+      onBackPress={() => router.back()}
+    />
+
+    <ScrollView style={styles.scrollView}>
+      <View
+        style={[styles.colorBar, { backgroundColor: event.corSelecionada || '#3B82F6' }]}
+      />
+
+      <View style={styles.content}>
+        <Text style={styles.title}>{event.title}</Text>
+
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <View style={styles.iconContainer}>
+              <Ionicons name="calendar-outline" size={18} color="#666" />
+            </View>
+            <Text style={styles.infoText}>{new Date(event.data).toLocaleDateString('pt-BR')}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <View style={styles.iconContainer}>
+              <Ionicons name="time-outline" size={18} color="#666" />
+            </View>
+            <Text style={styles.infoText}>{event.timeInicio} - {event.timeFim}</Text>
+          </View>
+
+          {event.localizacao && (
+            <View style={styles.infoRow}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="location-outline" size={18} color="#666" />
+              </View>
+              <Text style={styles.infoText}>{event.localizacao}</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.sectionTitle}>Descrição</Text>
+        <Text style={styles.description}>{event.descricao}</Text>
+
+        <View style={styles.buttonRow}>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Editar"
+              onPress={handleEdit}
+              type="outline"
+            />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Excluir"
+              onPress={handleDelete}
+              type="secondary"
+            />
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({

@@ -42,7 +42,7 @@ const RegisterScreen: React.FC = () => {
       const { confirmarSenha, ...dadosLimpos } = data;
       console.log("Dados enviados:", dadosLimpos);
           const response = await fetch(
-            `${process.env.EXPO_PUBLIC_URL_API}/clientes`,
+            `${process.env.EXPO_PUBLIC_URL_API}/clientes/register`,
             {
               method: 'POST',
               headers: {

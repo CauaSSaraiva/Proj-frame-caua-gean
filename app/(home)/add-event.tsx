@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
 // import { Ionicons } from '@expo/vector-icons';
 // import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -30,6 +30,10 @@ const COLORS = [
 const AddEventScreen = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const eventoId = params.eventId as string | undefined;
+
+  console.log("Todos os parâmetros:", params);
+  console.log("eventoId recebido:", eventoId)
 
   // Convertendo o parâmetro de data
   const dataInicial = params.date
@@ -45,6 +49,33 @@ const AddEventScreen = () => {
   const [corSelecionada, setCorSelecionada] = useState(COLORS[0]);
   const [loading, setLoading] = useState(false);
 
+
+    useEffect(() => {
+    if (eventoId) {
+      const carregarEvento = async () => {
+        try {
+          const response = await fetch(
+            `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventoId}`
+          );
+          const evento = await response.json();
+          
+          // Preenche os estados com os dados do evento
+          setTitle(evento.title);
+          setDescricao(evento.descricao);
+          setData(evento.data.split('T')[0]); // Ajuste conforme o formato da sua API
+          setTimeInicio(evento.timeInicio);
+          setTimeFim(evento.timeFim);
+          setLocalizacao(evento.localizacao);
+          setCorSelecionada(evento.corSelecionada);
+        } catch (error) {
+          console.error("Erro ao carregar evento:", error);
+        }
+      };
+
+      carregarEvento();
+    }
+  }, [eventoId]);
+
   const handleSave = async () => {
     if (!title.trim()) {
       // Mostrar erro
@@ -53,7 +84,7 @@ const AddEventScreen = () => {
 
     setLoading(true);
 
-
+    console.log("Data antes do envio:", data);
     try {
       // Simulação de uma operação assíncrona
       // await new Promise(resolve => setTimeout(resolve, 1000));
@@ -69,15 +100,20 @@ const AddEventScreen = () => {
 
       }
 
+    const url = eventoId
+      ? `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventoId}` // PUT (edição)
+      : `${process.env.EXPO_PUBLIC_URL_API}/eventos`; // POST (criação)
 
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_URL_API}/eventos`,
-        {
-          method: "POST",
-          headers: { "Content-type": "Application/json" },
-          body: JSON.stringify(novoEvento),
-        }
-      )
+    const method = eventoId ? "PUT" : "POST";
+
+    console.log(url)  
+    console.log(method)
+      
+    const response = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(novoEvento),
+    });
       console.log(novoEvento)
 
       if (response.status == 201) {

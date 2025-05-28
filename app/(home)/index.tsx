@@ -11,7 +11,9 @@ import Header from "../components/common/Header";
 import CustomCalendar from "../components/calendar/CustomCalendar";
 import AgendaList from "../components/agenda/AgendaList";
 import { EventItem } from "../components/agenda/AgendaItem";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useCallback } from 'react';
+
 
 
 // const mockEvents: EventItem[] = [
@@ -49,9 +51,11 @@ const HomeScreen = () => {
   const router = useRouter();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
+  // const [recarregar, setRecarregar] = useState(false);
+
 
   async function getDados() {
-        const response = await fetch(
+    const response = await fetch(
       `${process.env.EXPO_PUBLIC_URL_API}/eventos`,
       {
         method: "GET",
@@ -62,90 +66,101 @@ const HomeScreen = () => {
     console.log(dados)
     setEvents(dados)
   }
-  useEffect(() => {
-    // Simular carregamento de eventos
-    // uma API ou banco de dados
+  // useEffect(() => {
+  //   console.log('recarregou')
 
+  //   getDados()
+  // }, [recarregar]); //adicionado recarregar pra atualizar quando inserido evento
+  useFocusEffect(
+    // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
+    useCallback(() => {
+      // Invoked whenever the route is focused.
+      getDados()
 
-    getDados()
-  }, []);
+      // Return function is invoked whenever the route gets out of focus.
+      return () => {
+        console.log('This route is now unfocused.');
+      };
+    }, [])
+   )
 
-  const handleDateSelect = (date: Date) => {
-    setDataSelecionada(date);
-  };
+const handleDateSelect = (date: Date) => {
+  setDataSelecionada(date);
+};
 
-  const handleEventPress = (event: EventItem) => {
+const handleEventPress = (event: EventItem) => {
+  router.push({
+    pathname: "/event-details",
+    params: { eventId: event.id },
+  });
+};
+
+const handleAddEvent = () => {
+  // Formata a data como string simples (YYYY-MM-DD)
+  // setRecarregar(prev => !prev);
+  try {
     router.push({
-      pathname: "/event-details",
-      params: { eventId: event.id },
+      pathname: "/add-event",
+      params: { date: dataSelecionada.toISOString() },
     });
-  };
+  } catch (error) {
+    console.error("Erro ao navegar:", error);
+  }
+};
 
-  const handleAddEvent = () => {
-    // Formata a data como string simples (YYYY-MM-DD)
-    try {
-      router.push({
-        pathname: "/add-event",
-        params: { date: dataSelecionada.toISOString() },
-      });
-    } catch (error) {
-      console.error("Erro ao navegar:", error);
-    }
-  };
+// Formatação de data para comparação com os eventos
+const formatDate = (date: Date): string => {
+  return date.toISOString().split("T")[0]; // Retorna só o "YYYY-MM-DD"
+};
 
-  // Formatação de data para comparação com os eventos
-  const formatDate = (date: Date): string => {
-    return date.toISOString().split("T")[0]; // Retorna só o "YYYY-MM-DD"
-  };
+const markedDates = events.map((event) => event.data);
 
-  const markedDates = events.map((event) => event.data);
+console.log(markedDates)
 
-  console.log(markedDates)
+const filteredEvents = events.filter(
+  (event) => {
+    // Garante que event.data é string
+    const eventDate = typeof event.data === "string"
+      ? event.data.split("T")[0]
+      : new Date(event.data).toISOString().split("T")[0];
+    return eventDate === formatDate(dataSelecionada);
+  }
+);
+// tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
+// ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
+console.log(formatDate(dataSelecionada))
+console.log(filteredEvents)
+return (
+  <SafeAreaView style={styles.container}>
+    <Header
+      title="Minha Agenda"
+      rightComponent={
+        <TouchableOpacity onPress={handleAddEvent}>
+          <Ionicons name="add-circle-outline" size={24} color="#000" />
+        </TouchableOpacity>
+      }
+    />
 
-  const filteredEvents = events.filter(
-    (event) => {
-      // Garante que event.data é string
-      const eventDate = typeof event.data === "string"
-        ? event.data.split("T")[0]
-        : new Date(event.data).toISOString().split("T")[0];
-      return eventDate === formatDate(dataSelecionada);
-    }
-  );
-  // tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
-  // ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
-  console.log(formatDate(dataSelecionada))
-  console.log(filteredEvents)
-  return (
-    <SafeAreaView style={styles.container}>
-      <Header
-        title="Minha Agenda"
-        rightComponent={
-          <TouchableOpacity onPress={handleAddEvent}>
-            <Ionicons name="add-circle-outline" size={24} color="#000" />
-          </TouchableOpacity>
-        }
+    <View style={styles.contentContainer}>
+      <CustomCalendar
+        selectedDate={dataSelecionada}
+        onDateSelect={handleDateSelect}
+        markedDates={markedDates}
       />
 
-      <View style={styles.contentContainer}>
-        <CustomCalendar
-          selectedDate={dataSelecionada}
-          onDateSelect={handleDateSelect}
-          markedDates={markedDates}
+      <View style={styles.eventsContainer}>
+        <Text style={styles.dateHeader}>
+          Eventos para {dataSelecionada.toLocaleDateString("pt-BR")}
+        </Text>
+        <AgendaList
+          events={filteredEvents}
+          onEventPress={handleEventPress}
+          groupByDate={false}
         />
-
-        <View style={styles.eventsContainer}>
-          <Text style={styles.dateHeader}>
-            Eventos para {dataSelecionada.toLocaleDateString("pt-BR")}
-          </Text>
-          <AgendaList
-            events={filteredEvents}
-            onEventPress={handleEventPress}
-            groupByDate={false}
-          />
-        </View>
       </View>
-    </SafeAreaView>
-  );
+    </View>
+  </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({
