@@ -18,7 +18,7 @@ const EventDetailsScreen = () => {
     async function fetchEvent() {
       try {
         const response = await fetch(
-          `${process.env.EXPO_PUBLIC_URL_API}/eventos/${eventId}`,
+          `${process.env.EXPO_PUBLIC_URL_API}/eventos/pesquisa/${eventId}`,
           {
             method: "GET",
             headers: { "Content-type": "Application/json" },

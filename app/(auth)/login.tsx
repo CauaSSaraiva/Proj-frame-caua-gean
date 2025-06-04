@@ -4,7 +4,9 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useRouter } from 'expo-router';
 import { saveToken, removeToken } from '../utils/auth';
-import { useAuth } from '../_layout';
+import { useAuth } from '@/contexts/AuthContext';
+
+
 
 type Inputs = {
   email: string; 
@@ -16,13 +18,14 @@ console.log("API URL:", process.env.EXPO_PUBLIC_URL_API);
 
 
 const LoginScreen = () => {
-  const {setMemoryToken} = useAuth();
+  // const {setMemoryToken} = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [continuar, setContinuar] = useState(false)
   const [errors, setErrors] = useState<{ email?: string, password?: string }>({});
+  const { setMemoryToken, savePersistentToken, setUserData } = useAuth();
 
   // essa lógica ja está na API, comentada por enquanto
   // const validateForm = () => {
@@ -65,13 +68,19 @@ const LoginScreen = () => {
       if (response.status === 200) {
         const dados = await response.json(); 
         console.log(dados)
+        console.log(dados.id)
         // Salvar dados no AsyncStorage
           if (data.continuar) {
-            await saveToken(dados.token)
-            setMemoryToken(dados.token) // salvando o temporário também para o useffect disparar e redirecionar corretamente
+            // await saveToken(dados.token)
+            // setMemoryToken(dados.token) // salvando o temporário também para o useffect disparar e redirecionar corretamente
+            await savePersistentToken(dados.token);
+             setUserData(dados.id);
+             setMemoryToken(dados.token)
           } else {
-            await removeToken();
-            setMemoryToken(dados.token)
+            // await removeToken();
+            // setMemoryToken(dados.token)
+               setMemoryToken(dados.token);
+               setUserData(dados.id);
           }
           setLoading(false)
 

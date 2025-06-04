@@ -6,6 +6,7 @@ import Header from '../components/common/Header';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button'; // Caminho corrigido (common/Button em vez de common.Button)
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Inputs = {
   title: string
@@ -15,6 +16,7 @@ type Inputs = {
   timeFim: string
   localizacao: string
   corSelecionada: string
+  clienteId: String
 }
 
 
@@ -48,6 +50,7 @@ const AddEventScreen = () => {
   const [localizacao, setLocalizacao] = useState('');
   const [corSelecionada, setCorSelecionada] = useState(COLORS[0]);
   const [loading, setLoading] = useState(false);
+  const { userData, memoryToken } = useAuth();
 
 
     useEffect(() => {
@@ -89,6 +92,9 @@ const AddEventScreen = () => {
       // Simulação de uma operação assíncrona
       // await new Promise(resolve => setTimeout(resolve, 1000));
 
+      if (!userData) {
+        throw new Error("teste")
+      }
       const novoEvento: Inputs = {
         title,
         descricao,
@@ -96,7 +102,8 @@ const AddEventScreen = () => {
         timeInicio,
         timeFim,
         localizacao,
-        corSelecionada
+        corSelecionada,
+        clienteId: userData
 
       }
 

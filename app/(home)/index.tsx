@@ -13,6 +13,7 @@ import AgendaList from "../components/agenda/AgendaList";
 import { EventItem } from "../components/agenda/AgendaItem";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useCallback } from 'react';
+  import { useAuth } from "@/contexts/AuthContext";
 
 
 
@@ -51,12 +52,23 @@ const HomeScreen = () => {
   const router = useRouter();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
+
+ 
+  const { userData, memoryToken } = useAuth();
+
+  // useEffect(() => {
+  //   if (memoryToken && !userData) {
+  //     loadUserData();
+  //   }
+  // }, [memoryToken]);
   // const [recarregar, setRecarregar] = useState(false);
 
 
   async function getDados() {
+    
+    console.log(`USERDATA: ${userData}`)
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_URL_API}/eventos`,
+      `${process.env.EXPO_PUBLIC_URL_API}/eventos/${userData}`,
       {
         method: "GET",
         headers: { "Content-type": "Application/json" },
