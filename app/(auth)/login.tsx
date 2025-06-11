@@ -104,11 +104,13 @@ const LoginScreen = () => {
       <View style={styles.content}>
         <View style={styles.headerContainer}>
           <Image
-            source={require('../../assets/icon.png')}
+            source={require("../../assets/adaptive-icon.png")}
             style={styles.logo}
           />
           <Text style={styles.title}>Agenda App</Text>
-          <Text style={styles.subtitle}>Organize sua rotina com facilidade</Text>
+          <Text style={styles.subtitle}>
+            Organize sua rotina com facilidade
+          </Text>
         </View>
 
         <Input
@@ -137,26 +139,25 @@ const LoginScreen = () => {
           onPress={() => setContinuar(true)}
           style={styles.checkboxContainer}
         >
-          <View style={[styles.checkbox, continuar && styles.checkboxChecked]} />
+          <View
+            style={[styles.checkbox, continuar && styles.checkboxChecked]}
+          />
           <Text style={styles.checkboxLabel}>Continuar logado</Text>
         </TouchableOpacity>
 
+        <Button
+          title="Entrar"
+          onPress={() => verificaLogin({ email, senha, continuar })}
+          loading={loading}
+        />
 
-          <Button
-            title="Entrar"
-            onPress={() => verificaLogin({ email, senha, continuar })}
-            loading={loading}
-          />
-
-
-
-          <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Não tem uma conta? </Text>
-            <TouchableOpacity onPress={() => router.push('/register')}>
-              <Text style={styles.registerLink}>Cadastre-se</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.registerContainer}>
+          <Text style={styles.registerText}>Não tem uma conta? </Text>
+          <TouchableOpacity onPress={() => router.push("/register")}>
+            <Text style={styles.registerLink}>Cadastre-se</Text>
+          </TouchableOpacity>
         </View>
+      </View>
     </SafeAreaView>
   );
 };

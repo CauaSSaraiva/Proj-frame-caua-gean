@@ -4,7 +4,7 @@ import { View, ScrollView, Text, TouchableOpacity, SafeAreaView, StyleSheet } fr
 // import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Header from '../components/common/Header';
 import Input from '../components/common/Input';
-import Button from '../components/common/Button'; // Caminho corrigido (common/Button em vez de common.Button)
+import Button from '../components/common/Button'; 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -65,7 +65,7 @@ const AddEventScreen = () => {
           // Preenche os estados com os dados do evento
           setTitle(evento.title);
           setDescricao(evento.descricao);
-          setData(evento.data.split('T')[0]); // Ajuste conforme o formato da sua API
+          setData(evento.data.split('T')[0]); 
           setTimeInicio(evento.timeInicio);
           setTimeFim(evento.timeFim);
           setLocalizacao(evento.localizacao);
@@ -89,8 +89,6 @@ const AddEventScreen = () => {
 
     console.log("Data antes do envio:", data);
     try {
-      // Simulação de uma operação assíncrona
-      // await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (!userData) {
         throw new Error("teste")
