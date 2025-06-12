@@ -16,7 +16,7 @@ import { useCallback } from 'react';
   import { useAuth } from "@/contexts/AuthContext";
 
 
-
+//comentado provisóriamente para testes, depois pode ser removido
 // const mockEvents: EventItem[] = [
 //   {
 //     id: '1',
@@ -92,7 +92,8 @@ const HomeScreen = () => {
       // Return function is invoked whenever the route gets out of focus.
       return () => {
         console.log('This route is now unfocused.');
-      };
+      }; 
+
     }, [])
    )
 
