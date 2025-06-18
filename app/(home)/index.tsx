@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StyleSheet,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "../components/common/Header";
@@ -52,7 +53,7 @@ const HomeScreen = () => {
   const router = useRouter();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
  
   const { userData, memoryToken, isAuthChecked } = useAuth();
 
@@ -65,17 +66,16 @@ const HomeScreen = () => {
 
 
   async function getDados() {
-    
     console.log(`USERDATA: ${userData}`)
+    const url = `${process.env.EXPO_PUBLIC_URL_API}/eventos/input/${userData}${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`;
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_URL_API}/eventos/${userData}`,
+      url,
       {
         method: "GET",
         headers: { "Content-type": "Application/json" },
       }
     )
     const dados = await response.json()
-    console.log(dados)
     setEvents(dados)
   }
   // useEffect(() => {
@@ -89,8 +89,7 @@ const HomeScreen = () => {
       if (userData && isAuthChecked) {
         getDados();
       }
-      // Não retorna nada aqui, pois não precisa desfazer nada
-    }, [userData, isAuthChecked, dataSelecionada])
+    }, [userData, isAuthChecked, dataSelecionada, searchTerm])
    )
 
 const handleDateSelect = (date: Date) => {
@@ -126,15 +125,15 @@ const markedDates = events.map((event) => event.data);
 
 console.log(markedDates)
 
-const filteredEvents = events.filter(
-  (event) => {
-    // Garante que event.data é string
-    const eventDate = typeof event.data === "string"
-      ? event.data.split("T")[0]
-      : new Date(event.data).toISOString().split("T")[0];
-    return eventDate === formatDate(dataSelecionada);
-  }
-);
+const filteredEvents = searchTerm
+  ? events // Se está buscando, mostra todos os eventos retornados pela API (já filtrados)
+  : events.filter((event) => {
+      const eventDate = typeof event.data === "string"
+        ? event.data.split("T")[0]
+        : new Date(event.data).toISOString().split("T")[0];
+      return eventDate === formatDate(dataSelecionada);
+    });
+
 // tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
 // ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
 console.log(formatDate(dataSelecionada))
@@ -151,15 +150,31 @@ return (
     />
 
     <View style={styles.contentContainer}>
-      <CustomCalendar
-        selectedDate={dataSelecionada}
-        onDateSelect={handleDateSelect}
-        markedDates={markedDates}
-      />
+      {/* Campo de busca */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={18} color="#888" style={{ marginRight: 8 }} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar eventos..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          placeholderTextColor="#888"
+          returnKeyType="search"
+        />
+      </View>
+      {!searchTerm && (
+        <CustomCalendar
+          selectedDate={dataSelecionada}
+          onDateSelect={handleDateSelect}
+          markedDates={markedDates}
+        />
+      )}
 
       <View style={styles.eventsContainer}>
         <Text style={styles.dateHeader}>
-          Eventos para {dataSelecionada.toLocaleDateString("pt-BR")}
+          {searchTerm
+            ? `Resultados para "${searchTerm}"`
+            : `Eventos para ${dataSelecionada.toLocaleDateString("pt-BR")}`}
         </Text>
         <AgendaList
           events={filteredEvents}
@@ -189,6 +204,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    height: 40,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: "#222",
+    paddingVertical: 0,
   },
 });
 
