@@ -54,7 +54,7 @@ const HomeScreen = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
 
  
-  const { userData, memoryToken } = useAuth();
+  const { userData, memoryToken, isAuthChecked } = useAuth();
 
   // useEffect(() => {
   //   if (memoryToken && !userData) {
@@ -86,14 +86,11 @@ const HomeScreen = () => {
   useFocusEffect(
     // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
     useCallback(() => {
-      // Invoked whenever the route is focused.
-      getDados()
-
-      // Return function is invoked whenever the route gets out of focus.
-      return () => {
-        console.log('This route is now unfocused.');
-      };
-    }, [])
+      if (userData && isAuthChecked) {
+        getDados();
+      }
+      // Não retorna nada aqui, pois não precisa desfazer nada
+    }, [userData, isAuthChecked, dataSelecionada])
    )
 
 const handleDateSelect = (date: Date) => {

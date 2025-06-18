@@ -143,7 +143,9 @@ return (
             <View style={styles.iconContainer}>
               <Ionicons name="calendar-outline" size={18} color="#666" />
             </View>
-            <Text style={styles.infoText}>{new Date(event.data).toLocaleDateString('pt-BR')}</Text>
+            <Text style={styles.infoText}>
+              {formatDateOnly(event.data)}
+            </Text>
           </View>
 
           <View style={styles.infoRow}>
@@ -188,6 +190,12 @@ return (
   </SafeAreaView>
 );
 };
+
+function formatDateOnly(dateString: string) {
+  // Pega só a parte da data
+  const [year, month, day] = dateString.split('T')[0].split('-');
+  return `${day}/${month}/${year}`;
+}
 
 const styles = StyleSheet.create({
   container: {

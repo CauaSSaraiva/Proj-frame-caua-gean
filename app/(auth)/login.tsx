@@ -71,16 +71,12 @@ const LoginScreen = () => {
         console.log(dados.id)
         // Salvar dados no AsyncStorage
           if (data.continuar) {
-            // await saveToken(dados.token)
-            // setMemoryToken(dados.token) // salvando o temporário também para o useffect disparar e redirecionar corretamente
-            await savePersistentToken(dados.token);
-             setUserData(dados.id);
-             setMemoryToken(dados.token)
+            await savePersistentToken(dados.token, dados.id); // Passe o id junto
+            setUserData(dados.id);
+            setMemoryToken(dados.token);
           } else {
-            // await removeToken();
-            // setMemoryToken(dados.token)
-               setMemoryToken(dados.token);
-               setUserData(dados.id);
+            setMemoryToken(dados.token);
+            setUserData(dados.id);
           }
           setLoading(false)
 

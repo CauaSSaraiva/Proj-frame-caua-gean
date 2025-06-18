@@ -12,7 +12,7 @@ export default function RootLayout() {
 }
 
 function AuthRedirector() {
-  const { memoryToken, isAuthChecked } = useAuth();
+  const { memoryToken, isAuthChecked, userData } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -23,7 +23,7 @@ function AuthRedirector() {
 
     if (!memoryToken && !inAuthGroup) {
       router.replace('/login');
-    } else if (memoryToken && inAuthGroup) {
+    } else if (memoryToken && inAuthGroup && userData ) {
       router.replace('/');
     }
   }, [memoryToken, isAuthChecked, segments]);

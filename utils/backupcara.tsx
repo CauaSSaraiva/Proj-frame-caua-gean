@@ -1,7 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { universalStorage } from '../utils/universalStorage';
-
-
+import { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type AuthContextType = {
   memoryToken: string | null;
@@ -22,22 +20,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Funções de persistência
   const savePersistentToken = async (token: string, userId: string) => {
-    await universalStorage.setItem('auth_token', token);
-    await universalStorage.setItem("user_data", String(userId));
+    await AsyncStorage.setItem("auth_token", token);
+    await AsyncStorage.setItem("user_data", String(userId));
   };
 
   const clearPersistentToken = async () => {
-    await universalStorage.removeItem('auth_token');
-    await universalStorage.removeItem('user_data');
+    await AsyncStorage.removeItem("auth_token");
+    await AsyncStorage.removeItem("user_data");
   };
 
   // Carrega token e userData ao iniciar
   useEffect(() => {
     const loadAuth = async () => {
-      const token = await universalStorage.getItem('auth_token');
-      console.log("Token carregado:", token);
-      const userId = await universalStorage.getItem('user_data');
-      console.log("User ID carregado:", userId);
+      const token = await AsyncStorage.getItem("auth_token");
+      const userId = await AsyncStorage.getItem("user_data");
       setMemoryToken(token);
       setUserData(userId);
       setIsAuthChecked(true);
@@ -64,6 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }
