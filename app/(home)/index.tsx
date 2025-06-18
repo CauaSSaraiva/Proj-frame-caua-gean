@@ -13,178 +13,190 @@ import CustomCalendar from "../components/calendar/CustomCalendar";
 import AgendaList from "../components/agenda/AgendaList";
 import { EventItem } from "../components/agenda/AgendaItem";
 import { useRouter, useFocusEffect } from "expo-router";
-import { useCallback } from 'react';
-  import { useAuth } from "@/contexts/AuthContext";
-
-
-//comentado provisóriamente para testes, depois pode ser removido
-// const mockEvents: EventItem[] = [
-//   {
-//     id: '1',
-//     title: 'Reunião de equipe',
-//     description: 'Discussão sobre o novo projeto',
-//     date: '2023-10-15',
-//     startTime: '09:00',
-//     endTime: '10:00',
-//     location: 'Sala de conferência'
-//   },
-//   {
-//     id: '2',
-//     title: 'Almoço com cliente',
-//     description: 'Apresentação da proposta comercial',
-//     date: '2023-10-15',
-//     startTime: '12:00',
-//     endTime: '13:30',
-//     location: 'Restaurante Central'
-//   },
-//   {
-//     id: '3',
-//     title: 'Entrevista de emprego',
-//     description: 'Vaga para desenvolvedor front-end',
-//     date: '2023-10-16',
-//     startTime: '14:00',
-//     endTime: '15:00',
-//     location: 'Online - Google Meet',
-//     color: '#FF6B6B'
-//   }
-// ];
+import { useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatDateOnly } from "@/utils/date";
 
 const HomeScreen = () => {
   const router = useRouter();
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [events, setEvents] = useState<EventItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
- 
-  const { userData, memoryToken, isAuthChecked } = useAuth();
+  const [proxEvento, setProxEvento] = useState<EventItem | null>(null);
 
-  // useEffect(() => {
-  //   if (memoryToken && !userData) {
-  //     loadUserData();
-  //   }
-  // }, [memoryToken]);
-  // const [recarregar, setRecarregar] = useState(false);
+  const { userData, memoryToken, isAuthChecked } = useAuth();
 
 
   async function getDados() {
-    console.log(`USERDATA: ${userData}`)
-    const url = `${process.env.EXPO_PUBLIC_URL_API}/eventos/input/${userData}${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`;
-    const response = await fetch(
-      url,
-      {
-        method: "GET",
-        headers: { "Content-type": "Application/json" },
-      }
-    )
-    const dados = await response.json()
-    setEvents(dados)
+    console.log(`USERDATA: ${userData}`);
+    const url = `${process.env.EXPO_PUBLIC_URL_API}/eventos/input/${userData}${
+      searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ""
+    }`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-type": "Application/json" },
+    });
+    const dados = await response.json();
+    setEvents(dados);
   }
-  // useEffect(() => {
-  //   console.log('recarregou')
 
-  //   getDados()
-  // }, [recarregar]); //adicionado recarregar pra atualizar quando inserido evento
+  useEffect(() => {
+    if (!events || events.length === 0) {
+      setProxEvento(null);
+      return;
+    }
+
+    const hoje = new Date();
+    const hojeStr = hoje.toISOString().split("T")[0];
+
+    // primeiro evento do dia atual
+    const eventoHoje = events.find((ev) => {
+      const dataEvStr =
+        typeof ev.data === "string"
+          ? ev.data.split("T")[0]
+          : new Date(ev.data).toISOString().split("T")[0];
+      return dataEvStr === hojeStr;
+    });
+
+    setProxEvento(eventoHoje || null);
+    console.log("Próximo evento:", eventoHoje);
+  }, [events]);
+
   useFocusEffect(
-    // Callback should be wrapped in `React.useCallback` to avoid running the effect too often.
     useCallback(() => {
       if (userData && isAuthChecked) {
         getDados();
       }
     }, [userData, isAuthChecked, dataSelecionada, searchTerm])
-   )
+  );
 
-const handleDateSelect = (date: Date) => {
-  setDataSelecionada(date);
-};
+  const handleDateSelect = (date: Date) => {
+    setDataSelecionada(date);
+  };
 
-const handleEventPress = (event: EventItem) => {
-  router.push({
-    pathname: "/event-details",
-    params: { eventId: event.id },
-  });
-};
-
-const handleAddEvent = () => {
-  // Formata a data como string simples (YYYY-MM-DD)
-  // setRecarregar(prev => !prev);
-  try {
+  const handleEventPress = (event: EventItem) => {
     router.push({
-      pathname: "/add-event",
-      params: { date: dataSelecionada.toISOString() },
+      pathname: "/event-details",
+      params: { eventId: event.id },
     });
-  } catch (error) {
-    console.error("Erro ao navegar:", error);
-  }
-};
+  };
 
-// Formatação de data para comparação com os eventos
-const formatDate = (date: Date): string => {
-  return date.toISOString().split("T")[0]; // Retorna só o "YYYY-MM-DD"
-};
+  const handleAddEvent = () => {
+    try {
+      router.push({
+        pathname: "/add-event",
+        params: { date: dataSelecionada.toISOString() },
+      });
+    } catch (error) {
+      console.error("Erro ao navegar:", error);
+    }
+  };
 
-const markedDates = events.map((event) => event.data);
+  // Formatação de data para comparação com os eventos
+  const formatDate = (date: Date): string => {
+    return date.toISOString().split("T")[0]; // Retorna só o "YYYY-MM-DD"
+  };
 
-console.log(markedDates)
+  const datasMarcadas = events.map((event) => event.data);
 
-const filteredEvents = searchTerm
-  ? events // Se está buscando, mostra todos os eventos retornados pela API (já filtrados)
-  : events.filter((event) => {
-      const eventDate = typeof event.data === "string"
-        ? event.data.split("T")[0]
-        : new Date(event.data).toISOString().split("T")[0];
-      return eventDate === formatDate(dataSelecionada);
-    });
+  console.log(datasMarcadas);
 
-// tem que concertar esse filtered events, ta saindo igual mas ele não ta funcionando
-// ta saindo o filteredevents como array vazia, embora testando deveria estar achando o evento
-console.log(formatDate(dataSelecionada))
-console.log(filteredEvents)
-return (
-  <SafeAreaView style={styles.container}>
-    <Header
-      title="Minha Agenda"
-      rightComponent={
-        <TouchableOpacity onPress={handleAddEvent}>
-          <Ionicons name="add-circle-outline" size={24} color="#000" />
-        </TouchableOpacity>
-      }
-    />
+  const eventosFiltrados = searchTerm
+    ? events // Se está buscando, mostra todos os eventos retornados pela API (já filtrados)
+    : events.filter((event) => {
+        const eventDate =
+          typeof event.data === "string"
+            ? event.data.split("T")[0]
+            : new Date(event.data).toISOString().split("T")[0];
+        return eventDate === formatDate(dataSelecionada);
+      });
 
-    <View style={styles.contentContainer}>
-      {/* Campo de busca */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={18} color="#888" style={{ marginRight: 8 }} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar eventos..."
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          placeholderTextColor="#888"
-          returnKeyType="search"
-        />
+
+  console.log(formatDate(dataSelecionada));
+  console.log(eventosFiltrados);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header
+        title="Minha Agenda"
+        rightComponent={
+          <TouchableOpacity onPress={handleAddEvent}>
+            <Ionicons name="add-circle-outline" size={24} color="#000" />
+          </TouchableOpacity>
+        }
+      />
+
+      <View style={styles.contentContainer}>
+        {/* Campo de busca */}
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={18}
+            color="#888"
+            style={{ marginRight: 8 }}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar eventos..."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            placeholderTextColor="#888"
+            returnKeyType="search"
+          />
+        </View>
+
+        {/* Card do próximo evento */}
+        {proxEvento && (
+          <TouchableOpacity
+            style={styles.proxEventoCard}
+            onPress={() => handleEventPress(proxEvento)}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name="alarm"
+              size={20}
+              color="#3B82F6"
+              style={{ marginRight: 8 }}
+            />
+            <View>
+              <Text style={styles.proxEventoTitle}>
+                Próximo evento: {proxEvento.title}
+              </Text>
+              <Text style={styles.proxEventoInfo}>
+                {proxEvento.timeInicio
+                  ? `Dia ${formatDateOnly(proxEvento.data)} às ${
+                      proxEvento.timeInicio
+                    }`
+                  : `Dia ${formatDateOnly(proxEvento.data)}`}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Calendário e lista de eventos */}
+        {!searchTerm && (
+          <CustomCalendar
+            selectedDate={dataSelecionada}
+            onDateSelect={handleDateSelect}
+            markedDates={datasMarcadas} // <-- altere aqui
+          />
+        )}
+
+        <View style={styles.eventsContainer}>
+          <Text style={styles.dateHeader}>
+            {searchTerm
+              ? `Resultados para "${searchTerm}"`
+              : `Eventos para ${dataSelecionada.toLocaleDateString("pt-BR")}`}
+          </Text>
+          <AgendaList
+            events={eventosFiltrados} // <-- altere aqui
+            onEventPress={handleEventPress}
+            groupByDate={false}
+          />
+        </View>
       </View>
-      {!searchTerm && (
-        <CustomCalendar
-          selectedDate={dataSelecionada}
-          onDateSelect={handleDateSelect}
-          markedDates={markedDates}
-        />
-      )}
-
-      <View style={styles.eventsContainer}>
-        <Text style={styles.dateHeader}>
-          {searchTerm
-            ? `Resultados para "${searchTerm}"`
-            : `Eventos para ${dataSelecionada.toLocaleDateString("pt-BR")}`}
-        </Text>
-        <AgendaList
-          events={filteredEvents}
-          onEventPress={handleEventPress}
-          groupByDate={false}
-        />
-      </View>
-    </View>
-  </SafeAreaView>
-);
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -221,6 +233,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#222",
     paddingVertical: 0,
+  },
+  proxEventoCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E0F2FE",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    padding: 12,
+    elevation: 2, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  proxEventoTitle: {
+    color: "#2563EB",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  proxEventoInfo: {
+    color: "#2563EB",
+    fontSize: 13,
+    marginTop: 2,
   },
 });
 

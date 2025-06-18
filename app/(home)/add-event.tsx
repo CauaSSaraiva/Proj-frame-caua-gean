@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, SafeAreaView, StyleSheet } from 'react-native';
-// import { Ionicons } from '@expo/vector-icons';
-// import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Header from '../components/common/Header';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button'; 

@@ -5,6 +5,7 @@ import Header from './components/common/Header';
 import Button from './components/common/Button';
 import { EventItem } from './components/agenda/AgendaItem';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { formatDateOnly } from '../utils/date';
 
 const EventDetailsScreen = () => {
   const router = useRouter();
@@ -14,32 +15,31 @@ const EventDetailsScreen = () => {
   const [event, setEvent] = useState<EventItem | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchEvent() {
-      try {
-        const response = await fetch(
-          `${process.env.EXPO_PUBLIC_URL_API}/eventos/pesquisa/${eventId}`,
-          {
-            method: "GET",
-            headers: { "Content-type": "Application/json" },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setEvent(data);
-        } else {
-          setEvent(null);
+  const buscarEvento = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_URL_API}/eventos/pesquisa/${eventId}`,
+        {
+          method: "GET",
+          headers: { "Content-type": "Application/json" },
         }
-      } catch (error) {
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setEvent(data);
+      } else {
         setEvent(null);
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+      setEvent(null);
+    } finally {
+      setLoading(false);
     }
-    if (eventId) {
-      fetchEvent();
-    }
-  }, [eventId]);
+  };
+
+  useEffect(() => {
+    buscarEvento();
+  }, []);
 
 const deletarEvento = async () => {
   try {
@@ -191,11 +191,7 @@ return (
 );
 };
 
-function formatDateOnly(dateString: string) {
-  // Pega só a parte da data
-  const [year, month, day] = dateString.split('T')[0].split('-');
-  return `${day}/${month}/${year}`;
-}
+
 
 const styles = StyleSheet.create({
   container: {

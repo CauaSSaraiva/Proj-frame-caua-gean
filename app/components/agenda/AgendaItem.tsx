@@ -4,14 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 export interface EventItem {
   id: number;
-  // data: any;
-  // title: string;
-  // description: string;
-  // date: string;
-  // startTime: string;
-  // endTime: string;
-  // location?: string;
-  // color?: string;
   title: string
   descricao: string
   data: string

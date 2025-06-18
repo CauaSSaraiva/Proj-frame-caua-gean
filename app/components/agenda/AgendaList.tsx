@@ -50,7 +50,7 @@ const AgendaList: React.FC<AgendaListProps> = ({
     return (
       <SectionList
         sections={groupEventsByDate()}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <AgendaItem event={item} onPress={onEventPress} />
         )}
@@ -68,7 +68,7 @@ const AgendaList: React.FC<AgendaListProps> = ({
   return (
     <FlatList
       data={events}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
         <AgendaItem event={item} onPress={onEventPress} />
       )}
