@@ -16,7 +16,7 @@ import { useCallback } from 'react';
   import { useAuth } from "@/contexts/AuthContext";
 
 
-
+//comentado provisóriamente para testes, depois pode ser removido
 // const mockEvents: EventItem[] = [
 //   {
 //     id: '1',
