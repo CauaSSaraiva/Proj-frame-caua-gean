@@ -85,7 +85,7 @@ const handleDelete = () => {
         {
           text: 'Excluir',
           style: 'destructive',
-          onPress: () => deletarEvento() // Forma correta para onPress
+          onPress: () => deletarEvento() 
         }
       ]
     );

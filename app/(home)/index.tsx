@@ -178,7 +178,7 @@ const HomeScreen = () => {
           <CustomCalendar
             selectedDate={dataSelecionada}
             onDateSelect={handleDateSelect}
-            markedDates={datasMarcadas} // <-- altere aqui
+            markedDates={datasMarcadas} 
           />
         )}
 
@@ -189,7 +189,7 @@ const HomeScreen = () => {
               : `Eventos para ${dataSelecionada.toLocaleDateString("pt-BR")}`}
           </Text>
           <AgendaList
-            events={eventosFiltrados} // <-- altere aqui
+            events={eventosFiltrados} 
             onEventPress={handleEventPress}
             groupByDate={false}
           />
