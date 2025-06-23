@@ -23,20 +23,20 @@ Esse é um projeto Expo [Expo](https://expo.dev) desenvolvido com o objetivo de 
 
 4.  **Para execução da API, execute os seguintes passos:**
 
-    a.  Na pasta da API, execute o comando no terminal:
+   -  a.  Na pasta da API, execute o comando no terminal:
         ```bash
         npm install
         ```
-    b.  Crie o arquivo `.env` na raiz da API com as seguintes variáveis:
+   -  b.  Crie o arquivo `.env` na raiz da API com as seguintes variáveis:
         ```
         DATABASE_URL = 'mysql://root:<SUASENHA>@localhost:3306/<apiFrameworkCAUAGEAN>'  -> para usar mysql local, ou um link de conexão de bancos como neon.tech
         JWT_KEY = '<QualquerChaveQueQueira>'
         ```
-    c.  Execute no terminal, na pasta raiz da API:
+   -  c.  Execute no terminal, na pasta raiz da API:
         ```bash
         npx prisma migrate dev --name "migracao inicial"
         ```
-    d.  Por fim, rode a API com o seguinte comando no terminal:
+   -  d.  Por fim, rode a API com o seguinte comando no terminal:
         ```bash
         npm run dev
         ```
