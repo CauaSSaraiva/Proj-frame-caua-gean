@@ -1,50 +1,45 @@
-# Welcome to your Expo app 👋
+# Descrição
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Esse é um projeto Expo [Expo](https://expo.dev) desenvolvido com objetivo de facilitar organização de estudantes com o básico e necessário cronograma.
 
-## Get started
+## Para utilizar:
 
-1. Install dependencies
+1. Instale as dependências na pasta raíz
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Adicione o arquivo .env na raiz do projeto expo com a seguinte variável:
+
+  EXPO_PUBLIC_URL_API=http://localhost:3004
+
+3. Clone a api do repositório a seguir:
+https://github.com/CauaSSaraiva/api-proj-frame-cauagean
+
+4. Para execução da API execute os seguintes passos:
+ a. Na pasta da api execute o comando no terminal: npm install
+ b. crie o arquivo .env na raiz com as seguintes variáveis:
+    - DATABASE_URL = 'mysql://root:<SUASENHA>@localhost:3306/<apiFrameworkCAUAGEAN>'  -> para usar mysql local, ou um link de conexão de bancos como neon.tech
+    - JWT_KEY = '<QualquerChaveQueQueira>'
+ c. execute no terminal na pasta raíz: npx prisma migrate dev --name "migracao inicial" 
+ d. por fim rode a api com o seguinte comando no terminal: npm run dev
+
+
+5. Inicie o expo
 
    ```bash
     npx expo start
    ```
 
-In the output, you'll find options to open the app in a
-
+6. Exiba o aplicativo abrindo uma página do navegador na url fornececida ou da maneira preferia (como expo go, build de desenv...): 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [Expo Go](https://expo.dev/go)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+7. (OPCIONAL) - se quiser que abra automaticamente no navegador no link de conexão só rodar o seguinte comando:
+   ```bash
+   npm run web
+   ```
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
