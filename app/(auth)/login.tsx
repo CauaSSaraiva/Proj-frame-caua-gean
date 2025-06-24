@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, SafeAreaView, StyleSheet, Alert, P
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useRouter } from 'expo-router';
-import { saveToken, removeToken } from '../utils/auth';
+// import { saveToken, removeToken } from '../utils/auth';
 import { useAuth } from '@/contexts/AuthContext';
 
 
@@ -100,10 +100,10 @@ const LoginScreen = () => {
       <View style={styles.content}>
         <View style={styles.headerContainer}>
           <Image
-            source={require("../../assets/adaptive-icon.png")}
+            source={require("../../assets/calendario.png")}
             style={styles.logo}
           />
-          <Text style={styles.title}>Agenda App</Text>
+          <Text style={styles.title}>Minha Agenda</Text>
           <Text style={styles.subtitle}>
             Organize sua rotina com facilidade
           </Text>
